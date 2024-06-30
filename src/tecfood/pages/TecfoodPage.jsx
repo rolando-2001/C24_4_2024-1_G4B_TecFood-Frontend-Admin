@@ -1,11 +1,16 @@
 
-import { useViewStore } from "../../hooks";
+import { useEffect } from "react";
+import {useViewStore } from "../../hooks";
 import { TecfoodLayout } from "../layout/TecfoodLayout";
-import { CategoryView, NoteView, SelectedView, UserView } from "../views";
-
+import { CategoryView, NoteView, OrderView, SelectedView, UserView } from "../views";
+import {Toaster} from 'react-hot-toast';
 
 export const TecfoodPage = () => {
-  const { currentViews } = useViewStore();
+  const { currentViews ,getCurrentView } = useViewStore();
+
+  useEffect(() => {
+    getCurrentView();
+  }, []);
 
   // Renderiza la vista según la vista activa
   const renderView = () => {
@@ -18,6 +23,9 @@ export const TecfoodPage = () => {
         return <UserView />;
       case 'category':
         return <CategoryView />;
+      case 'order':
+        return <OrderView/>;
+      
       default:
         return null;
     }
@@ -25,6 +33,7 @@ export const TecfoodPage = () => {
 
   return (
     <TecfoodLayout>
+      <Toaster />
       {renderView()}
     </TecfoodLayout>
   );

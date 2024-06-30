@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Obtener las variables de entorno
-const VITE_API_URL = "http://127.0.0.1:8000";
+const VITE_API_URL = "https://tecfood-ucer.onrender.com";
 
 // Crear instancia de axios con la URL base
 export const tecfoodApi = axios.create({

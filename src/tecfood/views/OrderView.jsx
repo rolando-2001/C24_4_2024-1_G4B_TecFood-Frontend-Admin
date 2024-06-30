@@ -4,25 +4,53 @@ import {
   SaveOutlined,
 } from "@mui/icons-material";
 import { Button, Grid, Typography } from "@mui/material";
-import { useUserStore } from "../../hooks/useUserStore";
+import { useOrderStore, useUiStore } from "../../hooks";
 import { useEffect, useState } from "react";
+import { OrderModal } from "../components";
 
-export const UserView = () => {
-  const { users, startLoadingUsersEvents } = useUserStore();
-  console.log(users);
+
+export const OrderView = () => {
+  const { orders = [], getListOrders,setOrderEvent ,startDeleteOrder} = useOrderStore();
+
+  const { openDateModal } = useUiStore();
+
+
 
   useEffect(() => {
-    startLoadingUsersEvents();
-  }, []);
+    getListOrders();
+  },[]);
 
-  const [search, setSearch] = useState("");
-  
-  const searcher = (e) => {
-    setSearch(e.target.value);
+  const clickNewOrder = () => {
+    setOrderEvent({
+      order_date: "",
+      total: "",
+      invoice_report_url: "",
+      status: "PENDING",
+      user_id: "",
+    })
+    openDateModal();
+  };
+
+ const clickEditOrder = (order) => {
+    setOrderEvent(order);
+    openDateModal();
+ };
+
+ const clickDeleteOrder = async(order) => {
+  await startDeleteOrder(order);
+ }
+
+ const[search,setSearch]= useState('');
+
+  const handleChange = (e) => {
+    setSearch(e.target.value)
+    
   }
 
-  const results= !search?users:users.filter(user=>user.first_name.toLowerCase().includes(search.toLowerCase()));
 
+  const results = !handleChange ? orders : orders.filter((dato)=> dato.status.toLowerCase().includes(search.toLocaleLowerCase()))
+
+ 
 
   return (
     <Grid
@@ -44,12 +72,12 @@ export const UserView = () => {
             display: "inline-block",
           }}
         >
-        TOTAL DE  USUARIOS {users.length}
+          Total de Ordenes {orders.length}
         </Typography>
       </Grid>
 
       <Grid item>
-        <Button>
+        <Button onClick={clickNewOrder}>
           <SaveOutlined
             sx={{
               fontSize: 30,
@@ -68,41 +96,43 @@ export const UserView = () => {
             <input
               type="text"
               className="form-control"
-              placeholder="Buscar Por nombre"
+              placeholder="Buscar Orden por Usuario"
               name="search"
-              onChange={searcher}
+              onChange={handleChange}
             />
           </div>
             <table className="table table-hover shadow-lg mt-4">
               <thead className="table-info text-center">
                 <tr>
                   <th scope="col">ID</th>
-                  <th scope="col">Nombre</th>
-                  <td scope="col">apellido</td>
-                  <td scope="col"> email</td>
-                  <td scope="col">rol</td>
+                  <th scope="col">Total</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Usuario</th>
+                  <th scope="col">Usuario Id</th>
+                  <th scope="col">Fecha de Orden</th>
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>
               <tbody className="text-center">
-                {results.map((user) => (
-                  <tr key={user.user_id}>
-                    <td className="align-middle">{user.user_id}</td>
-                    <td className="align-middle">
-                      {user.first_name.toUpperCase()}
-                    </td>
-                    <td className="align-middle">{user.last_name}</td>
-                    <td className="align-middle">{user.email}</td>
-                    <td className="align-middle">
-                      {user.role_name === "ROLE_ADMIN" ? " ADMIN" : "USER"}
-                    </td>
+                {results.map((order) => (
+                  <tr key={order.order_id}>
+                    <td className="align-middle">{order.order_id}</td>
+                    <td className="align-middle">S/{order.total}</td>
+                    <td className="align-middle">{order.status}</td>
+                    <td className="align-middle">{order.order_user}</td>
+                    <td className="align-middle">{order.user_id}</td>
+                    <td className="align-middle">{order.order_date}</td>
 
                     <td className="align-middle">
-                      <Button color="error" variant="contained">
+                      <Button color="error" variant="contained"
+                      
+                      onClick={() => clickDeleteOrder(order)}
+                      >
                         <DeleteOutlined sx={{ fontSize: 20, mr: 1 }} />
                         Eliminar
                       </Button>
                       <Button
+                       onClick={() => clickEditOrder(order)}
                         color="secondary"
                         variant="contained"
                         sx={{ ml: 1 }}
@@ -117,7 +147,10 @@ export const UserView = () => {
             </table>
           </div>
         </div>
+
+
       </Grid>
+       <OrderModal />
     </Grid>
   );
 };

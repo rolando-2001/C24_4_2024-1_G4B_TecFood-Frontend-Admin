@@ -6,19 +6,29 @@ import {
 import { Button, Grid, Typography } from "@mui/material";
 import { NewModal } from "../components";
 import { useUiStore, useDishStore } from "../../hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCategoryStore } from "../../hooks/useCategoryStore";
 
+
+
 export const NoteView = () => {
-  //! hooks
-  const { dishs, setDishEvent, deleteDishEvent, startLoadingEvents } =
-    useDishStore();
-
+  const {
+    dishs = [],
+    setDishEvent,
+    deleteDishEvent,
+    startLoadingEvents,
+  } = useDishStore();
   const { startCategoryLoadingEvents } = useCategoryStore();
-
   const { openDateModal } = useUiStore();
 
-  //! Nuevo Dish
+  useEffect(() => {
+    startLoadingEvents();
+  }, []);
+
+  useEffect(() => {
+    startCategoryLoadingEvents();
+  }, []);
+
   const handleClickNew = () => {
     setDishEvent({
       name: "",
@@ -28,32 +38,32 @@ export const NoteView = () => {
       dish_category_id: 0,
       description: "",
     });
+
     openDateModal();
   };
 
-  //! Editar Dish
+  //!!editar platillo
   const seletDishe = (dish) => {
     setDishEvent(dish);
+
     openDateModal();
   };
 
-  //!! Delete Dish
-  const handleClickDelete = (dishs) => {
-    setDishEvent(dishs);
-
-    deleteDishEvent();
+  //!!eliminar platillo
+  const handleClickDelete = async (dish) => {
+    await deleteDishEvent(dish);
   };
 
-  //!!List Dishs
-  useEffect(() => {
-    startLoadingEvents();
-  }, []);
+  const [search, setSearch] = useState("");
 
-  //!! List categorys
-  useEffect(() => {
-    startCategoryLoadingEvents();
-  }, []);
+  const searcher = (e) => {
+    setSearch(e.target.value);
+  };
 
+  const results = !search? dishs : dishs.filter((dish) =>dish.name.toLowerCase().includes(search.toLowerCase()));
+
+ 
+  
   return (
     <Grid
       container
@@ -62,8 +72,19 @@ export const NoteView = () => {
       sx={{ mb: 2 }}
     >
       <Grid item>
-        <Typography fontSize={39} fontWeight="linght">
-           PLATILLOS
+        <Typography
+          fontSize={20}
+          fontWeight="linght"
+          sx={{
+            color: "primary.main",
+            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
+            borderRadius: "5px",
+            padding: "10px 10px",
+            backgroundColor: "secondary.light",
+            display: "inline-block",
+          }}
+        >
+          TOTAL DE PLATILLOS {dishs.length}
         </Typography>
       </Grid>
 
@@ -85,6 +106,16 @@ export const NoteView = () => {
 
       <Grid container>
         <div className="container">
+          <div className="form-group mb-2">
+            <label></label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Buscar Categoria"
+              name="search"
+              onChange={searcher}
+            />
+          </div>
           <div className="table-responsive">
             <table className="table table-hover shadow-lg mt-4">
               <thead className="table-info text-center">
@@ -101,7 +132,7 @@ export const NoteView = () => {
                 </tr>
               </thead>
               <tbody className="text-center">
-                {dishs.map((dish) => (
+                {results.map((dish) => (
                   <tr key={dish.dish_id}>
                     <td className="align-middle">
                       <img
@@ -119,7 +150,7 @@ export const NoteView = () => {
                         : dish.description}
                     </td>
 
-                    <td className="align-middle">${dish.price}</td>
+                    <td className="align-middle">S/ {dish.price}</td>
                     <td className="align-middle">{dish.category}</td>
                     <td className="align-middle">{dish.stock}</td>
                     <td className="align-middle">

@@ -19,10 +19,15 @@ export const userSlice = createSlice({
                 }
             })
             
+        },
+
+        onLogoutUser:(state)=>{
+            state.isLoadingUsers=true;
+            state.users=[];
         }
     }
 });
 
 
 // Action creators are generated for each case reducer function
-export const { onLoadUsersEvents } = userSlice.actions;
+export const { onLoadUsersEvents ,onLogoutUser} = userSlice.actions;

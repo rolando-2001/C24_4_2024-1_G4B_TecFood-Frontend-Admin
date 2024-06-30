@@ -5,6 +5,9 @@ import { useDishStore, useUiStore } from "../../hooks";
 
 import { fileUpload } from "../../helpers/fileUpload";
 import { useCategoryStore } from "../../hooks/useCategoryStore";
+import { showToast, validateForm } from "../../helpers/showToast";
+
+
 
 const customStyles = {
   content: {
@@ -12,8 +15,11 @@ const customStyles = {
     left: "60%",
     right: "auto",
     bottom: "auto",
+    maxHeight: "620px",
+    maxWidth: "500px",
     marginRight: "-50%",
     transform: "translate(-50%, -50%)",
+ 
   },
 };
 
@@ -65,9 +71,16 @@ export const NewModal = () => {
     setFormSubmited(true);
 
     //!!
-    await startDishEvent(formValues);
+    const errors = validateForm(formValues);
+    if (errors.length > 0) {
+      errors.forEach((error) => showToast(error, "error"));
+    }else{
+      await startDishEvent(formValues);
 
-    closeDateModal();
+      closeDateModal();
+    }
+
+
   };
 
   /** */
@@ -95,12 +108,15 @@ export const NewModal = () => {
     }
   };
 
+
+  
+
   return (
     <Modal
       isOpen={isDateModalOpen}
       onRequestClose={onCloseModal}
       style={customStyles}
-      className="modal"
+      className='modal'
       overlayClassName="modal-fondo"
       closeTimeoutMS={200}
     >
@@ -123,12 +139,13 @@ export const NewModal = () => {
             </div>
 
             <div className="form-group mb-3">
-              <label htmlFor="ima_url">Imagen</label>
+              <label htmlFor="img_url">Imagen</label>
               <input
                 id="img_url"
                 className="form-control"
                 type="file"
-                name="ima_url"
+                name="img_url"
+                autoComplete="off"
                 onChange={onFileInputChanged}
               />
             </div>

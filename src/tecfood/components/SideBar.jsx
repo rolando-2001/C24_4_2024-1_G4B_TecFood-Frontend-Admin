@@ -82,7 +82,7 @@ export const SideBar = ({drawerWidth=240}) => {
           </ListItem>
 
           <ListItem disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={()=>setCurrentView('order')}>
               <ListItemIcon>
                 <Receipt />
               </ListItemIcon>

@@ -5,9 +5,54 @@ import {
 } from "@mui/icons-material";
 import { Button, Grid, Typography } from "@mui/material";
 import { useCategoryStore } from "../../hooks/useCategoryStore";
+import { useEffect, useState } from "react";
+import { CategoryModal } from "../components";
+import { useUiStore } from "../../hooks";
 
 export const CategoryView = () => {
-  const { categorys } = useCategoryStore();
+  const {
+    categorys,
+    startCategoryLoadingEvents,
+    setCategoryEvent,
+    startDeleteCategoryEvent,
+    
+  } = useCategoryStore();
+
+  const { openDateModal } = useUiStore();
+
+  useEffect(() => {
+    startCategoryLoadingEvents();
+  }, []);
+
+  //! new Category
+  const ClickNewCategory = () => {
+    setCategoryEvent({
+      name: "",
+    });
+    openDateModal();
+  };
+
+  //! Edit Category
+  const ClickEditCategory = (category) => {
+    setCategoryEvent(category);
+    openDateModal();
+  };
+
+  //!! Delete Category
+  const ClickDeleteCategory = (category) => {
+    startDeleteCategoryEvent(category);
+  };
+
+  const [search, setSearch] = useState('');
+
+  const handleChange = (e) => {
+    setSearch(e.target.value)
+    
+    
+  };
+
+  const results = !handleChange ? categorys : categorys.filter((dato)=> dato.name.toLowerCase().includes(search.toLocaleLowerCase()))
+
 
   return (
     <Grid
@@ -17,13 +62,24 @@ export const CategoryView = () => {
       sx={{ mb: 2 }}
     >
       <Grid item>
-        <Typography fontSize={39} fontWeight="linght">
-        CATEGORIAS
+        <Typography
+          fontSize={20}
+          fontWeight="500"
+          sx={{
+            color: "primary.main",
+            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
+            borderRadius: "5px",
+            padding: "10px 10px",
+            backgroundColor: "secondary.light",
+            display: "inline-block",
+          }}
+        >
+          TOTAL DE CATEGORIAS {categorys.length}
         </Typography>
       </Grid>
 
       <Grid item>
-        <Button>
+        <Button onClick={ClickNewCategory}>
           <SaveOutlined
             sx={{
               fontSize: 30,
@@ -36,6 +92,16 @@ export const CategoryView = () => {
 
       <Grid container>
         <div className="container">
+          <div className="form-group mb-2">
+            <label></label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Buscar Categoria"
+              name="search"
+              onChange={handleChange}
+            />
+          </div>
           <div className="table-responsive">
             <table className="table table-hover shadow-lg mt-4">
               <thead className="table-info text-center">
@@ -46,7 +112,7 @@ export const CategoryView = () => {
                 </tr>
               </thead>
               <tbody className="text-center">
-                {categorys.map((category) => (
+                {results.map((category) => (
                   <tr key={category.dish_category_id}>
                     <td className="align-middle">
                       {category.dish_category_id}
@@ -54,7 +120,11 @@ export const CategoryView = () => {
                     <td className="align-middle">{category.name}</td>
 
                     <td className="align-middle">
-                      <Button color="error" variant="contained">
+                      <Button
+                        onClick={() => ClickDeleteCategory(category)}
+                        color="error"
+                        variant="contained"
+                      >
                         <DeleteOutlined sx={{ fontSize: 20, mr: 1 }} />
                         Eliminar
                       </Button>
@@ -62,6 +132,7 @@ export const CategoryView = () => {
                         color="secondary"
                         variant="contained"
                         sx={{ ml: 1 }}
+                        onClick={() => ClickEditCategory(category)}
                       >
                         <EditOutlined sx={{ fontSize: 20, mr: 1 }} />
                         Editar
@@ -75,6 +146,7 @@ export const CategoryView = () => {
         </div>
       </Grid>
 
+      <CategoryModal />
     </Grid>
   );
 };

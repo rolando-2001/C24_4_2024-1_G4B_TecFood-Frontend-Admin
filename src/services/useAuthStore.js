@@ -1,6 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { tecfoodApi } from "../api/tecfoodApi";
 import { clearErrorMessage, onChecking, onLogin, onLogout } from "../store";
+import { onLogoutUser } from "../store/user/userSlice";
+import { onLogoutCategory } from "../store/dish/categorySlice";
+import { onLogoutDish } from "../store/dish/dishSlice";
+import { onLogoutOrder } from "../store/order/orderSlice";
+import { onLogoutViews } from "../store/ui/viewsSlice";
 
 
 export const useAuthStore = () => {
@@ -25,7 +30,9 @@ export const useAuthStore = () => {
 
       console.log({ data });
     } catch (error) {
-      dispatch(onLogout("Credenciales incorrectas"));
+      const {message} =error.response.data
+      
+      dispatch(onLogout(message));
 
       setTimeout(() => {
         dispatch(clearErrorMessage());
@@ -60,6 +67,14 @@ export const useAuthStore = () => {
 
   const startLogout = () => {
     localStorage.clear();
+
+    dispatch(onLogoutUser());
+    dispatch(onLogoutCategory());
+    dispatch(onLogoutDish());
+    dispatch(onLogoutOrder())
+    dispatch(onLogoutViews());
+
+
     dispatch(onLogout());
   };
 

@@ -4,6 +4,7 @@ import { dishSlice } from "./dish/dishSlice";
 import { viewsSlice } from "./ui/viewsSlice";
 import { categorySlice } from "./dish/categorySlice";
 import { userSlice } from "./user/userSlice";
+import { orderSlice } from "./order/orderSlice";
 
 
 
@@ -16,6 +17,7 @@ export const store = configureStore({
     views: viewsSlice.reducer,
     category: categorySlice.reducer,
     user: userSlice.reducer,
+    order: orderSlice.reducer,
 
     
     
